@@ -19,6 +19,7 @@ export class AuthService {
         hash: hash,
       },
     });
+
     const tokens = await this.getTokens(user.id, user.email, user.role);
     // const { refresh_token } = tokens;
     //response.cookie('token', refresh_token, { httpOnly: true });

@@ -16,8 +16,9 @@ model User{
   lastName String
   phoneNumber String @unique
   address String?
-  avatar String[] @default([""])
-  isBlocked Boolean @default(true)
+  avatar String @default("")
+  publicIdImage String?
+  isBlocked Boolean @default(false)
   role Role @default(USER)
    hash String
   hashRt String?
@@ -34,12 +35,12 @@ model Product {
   id Int @id @default(autoincrement())
   productName String
   description String
-  price BigInt
+  price Int
   popularProduct String[]
-  quantitySold BigInt
-  averageEvaluate BigInt
-  SumComment BigInt
-  sumEvaluate BigInt
+  quantitySold Int
+  averageEvaluate Int
+  SumComment Int
+  sumEvaluate Int
   discount Int
   status Boolean  
   productImages ProductImage[]
@@ -67,24 +68,24 @@ model CategoryProduct {
   products ProductOnCategoryProducrs[]
 }
 model Evaluate {
- // id Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
   starts Int
   comment String
   time DateTime @default(now())
   userId Int  
-  user User? @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
   productId Int
-  product Product? @relation(fields: [productId], references: [id])
-  @@id([userId, productId])
+  product Product @relation(fields: [productId], references: [id])
 }
 model OrderOnProducts{
+  id Int @id @default(autoincrement())
    orderId Int
    order Order @relation(fields: [orderId],references: [id])
    productId Int
    product Product @relation(fields: [productId],references: [id])
    numberOf Int?
-   totalPrice BigInt?
-   @@id([orderId, productId])
+   totalPrice Int?
+ 
 }
 model ProductOnCategoryProducrs {
   productId Int
@@ -96,6 +97,7 @@ model ProductOnCategoryProducrs {
 model ProductImage {
   id Int @id @default(autoincrement())
   Url String 
+  publicIdImage String?
   productId Int
   product Product  @relation(fields: [productId],references: [id]) 
   
@@ -116,8 +118,6 @@ enum SIZE {
   XL
   XXL
 }
-
-
 enum PAYMENTMETHOD {
   DIRECT
   INDIRECT

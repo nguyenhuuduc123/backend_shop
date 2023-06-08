@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "users" ALTER COLUMN "avatar" SET NOT NULL,
+ALTER COLUMN "avatar" SET DEFAULT '',
+ALTER COLUMN "avatar" SET DATA TYPE TEXT;
