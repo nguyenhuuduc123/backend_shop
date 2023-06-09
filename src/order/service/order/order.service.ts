@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from '../../dtos';
-import { ProductType, ProductType1 } from 'src/order/dtos/product.type';
+import { ProductType } from 'src/order/dtos/product.type';
 import { UpdateOrderDto } from 'src/order/dtos/update.order.dto';
 
 @Injectable()
@@ -73,19 +73,7 @@ export class OrderService {
   // update
   async updateOrder(orderId: number, updateOrderDto: UpdateOrderDto) {
     // get all san pham
-    const kq = updateOrderDto.productIds.map((value, index) => {
-      return {
-        updateMany: {
-          where: {
-            productId: updateOrderDto.productIds[index],
-          },
-          data: {
-            numberOf: updateOrderDto.numberOf[index],
-            totalPrice: updateOrderDto.totalPrice[index],
-          },
-        },
-      };
-    });
+
     const u = await this.prisma.order.update({
       where: {
         id: orderId,
@@ -110,16 +98,4 @@ export class OrderService {
     return u;
   }
   // add product into order
-  async addProductIntoOrder(productId: number) {
-    // find order
-    const order = await this.prisma.order.findFirst({
-      where: {
-        id: 1,
-      },
-      include: {
-        products: true,
-      },
-    });
-    //
-  }
 }
