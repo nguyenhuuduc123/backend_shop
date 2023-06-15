@@ -4,5 +4,4 @@ export class UpdateOrderDto {
   ordered: boolean;
   productIds: number[];
   numberOf: number[];
-  totalPrice: number[];
 }

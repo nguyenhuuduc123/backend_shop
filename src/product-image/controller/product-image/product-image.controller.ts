@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Delete,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -21,5 +23,9 @@ export class ProductImageController {
       file,
       Number(productId),
     );
+  }
+  @Delete(':productId')
+  async deleteProfile(@Param('productId') id: string) {
+    return this.productImageService.deleteProductImage(Number(id));
   }
 }

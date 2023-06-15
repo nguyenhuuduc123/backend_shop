@@ -4,5 +4,4 @@ export class CreateOrderDto {
   ordered: boolean;
   productIds: number[];
   numberOf: number[];
-  totalPrice: number[];
 }
