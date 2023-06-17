@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as bcrypt from 'bcrypt';
@@ -6,9 +10,14 @@ import { Tokens } from './types';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import { RegiserUserDto } from './dto/register.dto';
+import { MailerService } from '@nest-modules/mailer';
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+    private mailService: MailerService,
+  ) {}
 
   async signupLocal(dto: RegiserUserDto): Promise<Tokens> {
     const hash = await this.hashData(dto.hash);
@@ -113,5 +122,43 @@ export class AuthService {
         hashRt: hash,
       },
     });
+  }
+  // change password
+  async sendEmailchangePassword(email: string) {
+    // find user by email
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (user != null && user.isBlocked == true)
+      throw new BadRequestException('user da bi chan hoac khong ton tai email');
+
+    const content = `<form method="post" >
+    <input type="hidden" name="password" value="password" />
+    <a href="http://localhost:3000/api/auth/reset/${user.id}">click here</a>
+    </form> `;
+    this.mailService.sendMail({
+      to: email,
+      from: '"nguyenhuuduc  👻" <duccccnguyen@gmail.com>',
+      subject: 'change password',
+      text: 'welocom',
+      html: content,
+    });
+  }
+  async changePassword(userId: number, password: string) {
+    // hash
+    const hashp = await this.hashData(password);
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        hash: hashp,
+      },
+    });
+    return {
+      message: 'thanh cong ',
+    };
   }
 }

@@ -38,4 +38,38 @@ export class ProductImageService {
   async getAllProduct() {
     return await this.prisma.product.findMany();
   }
+  async createMany(productId: number, files?: Express.Multer.File[]) {
+    try {
+      if (files) {
+        const images = await this.cloudinary.uploadImages(files).catch((e) => {
+          throw new BadRequestException(e.message);
+        });
+        if (images) {
+          images.forEach(async (img) => {
+            await this.prisma.productImage.create({
+              data: {
+                Url: img.url,
+                publicIdImage: img.public_id,
+                productId: productId,
+              },
+            });
+          });
+        }
+      }
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+  async deleteManyProductImage(productId: number) {
+    try {
+      //
+      await this.prisma.productImage.deleteMany({
+        where: {
+          productId: productId,
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 }

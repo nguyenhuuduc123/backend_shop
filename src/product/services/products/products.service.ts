@@ -10,18 +10,31 @@ export class ProductService {
   constructor(private prisma: PrismaService) {}
   // create product
   async createProduct(createproductDto: CreateProductDto) {
-    return this.prisma.product.create({
-      data: {
-        ...createproductDto,
-      },
-    });
+    try {
+      return this.prisma.product.create({
+        data: {
+          ...createproductDto,
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException('something went wrong');
+    }
   }
   // get all product
   async getAllProduct(dto: QueryTypeDto) {
     try {
+      const page = dto.page == null ? 1 : dto.page;
       return this.prisma.product.findMany({
-        skip: dto.skip ? Number(dto.page) * Number(dto.skip - 1) : 0,
-        take: dto.take ? Number(dto.take) : 100,
+        skip: dto.skip ? Number(page - 1) * Number(dto.skip) : 0,
+        take: dto.take ? Number(dto.take) : undefined,
+        where: {
+          productName: {
+            contains: dto.productName,
+          },
+        },
+        orderBy: {
+          price: dto.orderby == 'true' ? 'asc' : 'desc',
+        },
         include: {
           evaluate: true,
           orders: true,
@@ -80,4 +93,5 @@ export class ProductService {
       throw new BadRequestException('something went wrong or id not found');
     }
   }
+  // find product theo ten , order
 }

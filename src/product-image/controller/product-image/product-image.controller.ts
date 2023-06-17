@@ -28,4 +28,16 @@ export class ProductImageController {
   async deleteProfile(@Param('productId') id: string) {
     return this.productImageService.deleteProductImage(Number(id));
   }
+  @Post('createMany')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadManyImageProduct(
+    @UploadedFile() files: Express.Multer.File[],
+    @Body('productId') productId: string,
+  ) {
+    return await this.productImageService.createMany(Number(productId), files);
+  }
+  @Delete('deletemany/:productId')
+  async deleteAllImage(@Param('productId') id: string) {
+    return this.productImageService.deleteManyProductImage(Number(id));
+  }
 }

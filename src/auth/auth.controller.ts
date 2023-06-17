@@ -5,7 +5,9 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -105,5 +107,19 @@ export class AuthController {
   getMyName(@Req() req: Request) {
     console.log(req.user);
     return req.user;
+  }
+  @Public()
+  @Get('/reset-password/:email')
+  async sendMailtoResetPassword(@Param('email') email: string) {
+    console.log(email);
+    return this.authService.sendEmailchangePassword(email);
+  }
+  @Public()
+  @Put('reset/:id')
+  async changePassword(
+    @Param('id') id: string,
+    @Body('password') password: string,
+  ) {
+    return this.authService.changePassword(Number(id), password);
   }
 }

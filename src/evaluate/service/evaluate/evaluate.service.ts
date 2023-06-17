@@ -43,4 +43,17 @@ export class EvaluateService {
       throw new BadRequestException('something went wrong');
     }
   }
+  // get all evaluate
+  async getAllEvaluate(userId: number) {
+    try {
+      const allEvaluate = await this.prisma.evaluate.findMany({
+        where: {
+          userId: userId,
+        },
+      });
+      return allEvaluate;
+    } catch (error) {
+      throw new BadRequestException('co gi do sai o day');
+    }
+  }
 }

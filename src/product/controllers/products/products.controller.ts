@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { Public } from 'src/common/decorators';
+
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { CreateProductDto } from 'src/product/dtos/create.product.dto';
@@ -25,7 +25,8 @@ export class ProductsController {
 
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
-  @Post()
+  @HttpCode(201)
+  @Post('create')
   async createProduct(@Body() dto: CreateProductDto) {
     return await this.productService.createProduct(dto);
   }
@@ -34,9 +35,11 @@ export class ProductsController {
   @UseGuards(RolesGuard)
   @Get('all')
   async getAllproduct(@Query() dto: QueryTypeDto) {
+    console.log(dto.orderby);
     return this.productService.getAllProduct(dto);
   }
-  @Public()
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
   @Get(':id')
   async getProductById(@Param('id') id: string) {
     return this.productService.getProductById(Number(id));

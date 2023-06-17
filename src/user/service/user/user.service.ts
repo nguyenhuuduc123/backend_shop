@@ -7,6 +7,9 @@ import {
 } from '@nestjs/common';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { QueryUserDto } from 'src/user/dtos/query.user.dto';
+import { EditUserDto } from 'src/user/dtos/edit.user.dto';
+import { convertUserDto } from 'src/utils/convertUserDto';
 
 @Injectable()
 export class UserService {
@@ -35,7 +38,7 @@ export class UserService {
       },
     });
   }
-  // chan user
+  //
   async blockUserById(id: number) {
     // tim nguoi dung
     const user = await this.prisma.user.findUnique({
@@ -143,5 +146,40 @@ export class UserService {
         firstName: 'asc',
       },
     });
+  }
+  // find user by name email, sdt
+  async filterUser(query: QueryUserDto) {
+    try {
+      return await this.prisma.user.findMany({
+        where: {
+          firstName: {
+            contains: query.userName != null ? query.userName : undefined,
+          },
+          lastName: {
+            contains: query.userName != null ? query.userName : undefined,
+          },
+          email: {
+            contains: query.email != null ? query.email : undefined,
+          },
+          phoneNumber: {
+            contains: query.phoneNumber != null ? query.email : undefined,
+          },
+          isBlocked: false,
+        },
+        include: {
+          Order: true,
+        },
+      });
+    } catch (error) {}
+  }
+  async editInfomation(userId: number, editDto: EditUserDto) {
+    try {
+      await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: convertUserDto(editDto),
+      });
+    } catch (error) {}
   }
 }

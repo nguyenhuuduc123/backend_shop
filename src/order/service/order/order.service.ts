@@ -14,10 +14,8 @@ export class OrderService {
         id: userId,
       },
     });
-    if (!userExsit)
-      throw new BadRequestException(
-        'id khong khong hop hoac user khong ton tai',
-      );
+    if (!userExsit && userExsit.isBlocked == true)
+      throw new BadRequestException('id khong khong hop hoac user da bi chan');
 
     const kq: ProductType[] = [];
     for (let i = 0; i < createDto.productIds.length; i++) {

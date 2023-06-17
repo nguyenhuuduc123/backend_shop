@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { Public } from 'src/common/decorators';
+
 import { GetCurrentUserIdByAT } from 'src/common/decorators/get-userid-at.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -20,6 +20,8 @@ import { OrderService } from 'src/order/service/order/order.service';
 @Controller('order')
 export class OrderController {
   constructor(private orderService: OrderService) {}
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
   @Post()
   async createOrder(
     @Body() dto: CreateOrderDto,
@@ -28,7 +30,8 @@ export class OrderController {
   ) {
     return this.orderService.createOrder(Number(userid), dto);
   }
-  @Public()
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
   @Get('all')
   async getAllOrder() {
     return this.orderService.getAllOrder();

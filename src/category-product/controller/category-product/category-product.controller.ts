@@ -1,13 +1,28 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { Role } from '@prisma/client';
 import { CreateCategoryDto } from 'src/category-product/dtos/create.category.dto';
+import { EditCategoryDto } from 'src/category-product/dtos/edit.category.dto';
+import { QueryCategoryDto } from 'src/category-product/dtos/query.category.dto';
 import { UpdateCategoryDto } from 'src/category-product/dtos/update.category.dto';
 import { CategoryProductService } from 'src/category-product/service/category-product/category-product.service';
 import { Public } from 'src/common/decorators';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('category-product')
 export class CategoryProductController {
   constructor(private categoryService: CategoryProductService) {}
-  @Public()
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
   @Post('')
   async createCategory(@Body() createCategory: CreateCategoryDto) {
     return await this.categoryService.createCategory(createCategory);
@@ -22,5 +37,15 @@ export class CategoryProductController {
       Number(id),
       Number(updateCategory.productId),
     );
+  }
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
+  @Put('edit/:id')
+  async editCategory(@Body() edit: EditCategoryDto, @Param('id') id: string) {
+    return this.categoryService.updateCategory(Number(id), edit);
+  }
+  @Get('filter')
+  async getallProductByCategory(@Query() query: QueryCategoryDto) {
+    return this.categoryService.getallProductByCate(query);
   }
 }
