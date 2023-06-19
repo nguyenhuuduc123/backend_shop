@@ -14,6 +14,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CategoryProductModule } from './category-product/category-product.module';
 import { MailerModule } from '@nest-modules/mailer';
 import { OrderProductModule } from './order-product/order-product.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { OrderProductModule } from './order-product/order-product.module';
     CloudinaryModule,
     CategoryProductModule,
     OrderProductModule,
+    StripeModule,
   ],
   controllers: [],
   providers: [

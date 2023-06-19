@@ -41,7 +41,8 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
-    "streamifier": "^0.1.1"
+    "streamifier": "^0.1.1",
+    "stripe": "^12.9.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

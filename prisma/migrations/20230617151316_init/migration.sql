@@ -18,7 +18,8 @@ CREATE TABLE "users" (
     "lastName" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "address" TEXT,
-    "avatar" TEXT[] DEFAULT ARRAY['']::TEXT[],
+    "avatar" TEXT NOT NULL DEFAULT '',
+    "publicIdImage" TEXT,
     "isBlocked" BOOLEAN NOT NULL DEFAULT false,
     "role" "Role" NOT NULL DEFAULT 'USER',
     "hash" TEXT NOT NULL,
@@ -52,6 +53,8 @@ CREATE TABLE "Order" (
     "paied" BOOLEAN NOT NULL,
     "ordered" BOOLEAN NOT NULL,
     "userId" INTEGER NOT NULL,
+    "paymentDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "flat" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
@@ -68,23 +71,25 @@ CREATE TABLE "CategoryProduct" (
 
 -- CreateTable
 CREATE TABLE "Evaluate" (
+    "id" SERIAL NOT NULL,
     "starts" INTEGER NOT NULL,
     "comment" TEXT NOT NULL,
     "time" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" INTEGER NOT NULL,
     "productId" INTEGER NOT NULL,
 
-    CONSTRAINT "Evaluate_pkey" PRIMARY KEY ("userId","productId")
+    CONSTRAINT "Evaluate_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "OrderOnProducts" (
+    "id" SERIAL NOT NULL,
     "orderId" INTEGER NOT NULL,
     "productId" INTEGER NOT NULL,
     "numberOf" INTEGER,
     "totalPrice" INTEGER,
 
-    CONSTRAINT "OrderOnProducts_pkey" PRIMARY KEY ("orderId","productId")
+    CONSTRAINT "OrderOnProducts_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -99,6 +104,7 @@ CREATE TABLE "ProductOnCategoryProducrs" (
 CREATE TABLE "ProductImage" (
     "id" SERIAL NOT NULL,
     "Url" TEXT NOT NULL,
+    "publicIdImage" TEXT,
     "productId" INTEGER NOT NULL,
 
     CONSTRAINT "ProductImage_pkey" PRIMARY KEY ("id")
@@ -120,10 +126,10 @@ ALTER TABLE "Evaluate" ADD CONSTRAINT "Evaluate_userId_fkey" FOREIGN KEY ("userI
 ALTER TABLE "Evaluate" ADD CONSTRAINT "Evaluate_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderOnProducts" ADD CONSTRAINT "OrderOnProducts_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderOnProducts" ADD CONSTRAINT "OrderOnProducts_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderOnProducts" ADD CONSTRAINT "OrderOnProducts_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderOnProducts" ADD CONSTRAINT "OrderOnProducts_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProductOnCategoryProducrs" ADD CONSTRAINT "ProductOnCategoryProducrs_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
