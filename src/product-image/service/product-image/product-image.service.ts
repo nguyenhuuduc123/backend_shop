@@ -13,7 +13,7 @@ export class ProductImageService {
     // tao product image;
     return await this.prisma.productImage.create({
       data: {
-        Url: imageUpload.url,
+        url: imageUpload.url,
         publicIdImage: imageUpload.public_id,
         productId: productId,
       },
@@ -28,7 +28,7 @@ export class ProductImageService {
       });
 
       if (!product) throw new BadRequestException('profile not found');
-      if (product.Url) {
+      if (product.url) {
         await this.cloudinary.deleteImage(product.publicIdImage);
       }
     } catch (error) {
@@ -48,7 +48,7 @@ export class ProductImageService {
           images.forEach(async (img) => {
             await this.prisma.productImage.create({
               data: {
-                Url: img.url,
+                url: img.url,
                 publicIdImage: img.public_id,
                 productId: productId,
               },

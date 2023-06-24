@@ -9,7 +9,8 @@ export class StripeController {
   @Post()
   checkout(@Body() body: { cart: Cart }) {
     try {
-      return this.stripeService.checkOut(body.cart);
+      const data = this.stripeService.checkOut(body.cart);
+      return { data };
     } catch (error) {
       return error;
     }

@@ -18,16 +18,17 @@ export class CategoryProductService {
     if (ConvertSize.convertSize(dto.size) == null) {
       throw new BadRequestException('nhap size chua phu hop');
     }
-    return await this.prisma.categoryProduct.create({
+    return await this.prisma.categoryProductDetail.create({
       data: {
         quantity: Number(dto.quantity),
         size: ConvertSize.convertSize(dto.size),
         colors: ConvertColor.convertColor(dto.color),
+        remainAmount: 50,
       },
     });
   }
   async updateCategoryProduct(categoryId: number, productId: number) {
-    return await this.prisma.categoryProduct.update({
+    return await this.prisma.categoryProductDetail.update({
       where: {
         id: categoryId,
       },
@@ -50,7 +51,7 @@ export class CategoryProductService {
   // update category
   async updateCategory(categoryId: number, edit: EditCategoryDto) {
     try {
-      await this.prisma.categoryProduct.update({
+      await this.prisma.categoryProductDetail.update({
         where: {
           id: categoryId,
         },
@@ -79,7 +80,7 @@ export class CategoryProductService {
       throw new BadRequestException('nhap size chua phu hop');
     }
     try {
-      const query1 = await this.prisma.categoryProduct.findMany({
+      const query1 = await this.prisma.categoryProductDetail.findMany({
         where: {
           size:
             ConvertSize.convertSize(query.size) != null

@@ -7,12 +7,32 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class EvaluateService {
   constructor(private prisma: PrismaService) {}
   async createEvalue(dto: CreateEvaluateDto, userId: number) {
-    return await this.prisma.evaluate.create({
+    const e = await this.prisma.evaluate.create({
       data: {
         ...dto,
         userId: userId,
       },
     });
+    // find product
+    const productFind = await this.prisma.product.findUnique({
+      where: {
+        id: dto.productId,
+      },
+    });
+    if (e != null) {
+      const sumComment = productFind.sumComment + 1;
+      const sumEvaluate = productFind.sumEvaluate + 1;
+      await this.prisma.product.update({
+        where: {
+          id: dto.productId,
+        },
+        data: {
+          sumEvaluate: sumEvaluate,
+          sumComment: sumComment,
+        },
+      });
+      return e;
+    }
   }
   async updateEvaluate(evaluateId: number, dto: UpdateEvaluateDto) {
     try {
@@ -32,11 +52,11 @@ export class EvaluateService {
     }
   }
   // delete evaluate
-  async deleteEvaluate(evalueId: number) {
+  async deleteEvaluate(eId: number) {
     try {
       await this.prisma.evaluate.delete({
         where: {
-          id: evalueId,
+          id: eId,
         },
       });
     } catch (error) {

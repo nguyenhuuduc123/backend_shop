@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import stripe from 'stripe';
 import { Cart } from './cart.model';
-import { PrismaClient } from '@prisma/client';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class StripeService {
@@ -19,7 +19,7 @@ export class StripeService {
       },
     });
     // get username by order
-    const user = await this.prisma.user.findUnique({
+    await this.prisma.user.findUnique({
       where: {
         id: 1,
       },

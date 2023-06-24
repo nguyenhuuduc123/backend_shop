@@ -55,7 +55,7 @@ export class AuthController {
   async signinLocal(
     @Body() dto: AuthDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<Tokens> {
+  ) {
     const data = await this.authService.signinpLocal(dto);
     console.log(111);
     const { refresh_token } = data;
@@ -64,7 +64,9 @@ export class AuthController {
     res.cookie('token', '');
     // thiet lap cookie cho trinh duyet
     res.cookie('token', refresh_token);
-    return data;
+    return {
+      data: data,
+    };
   }
 
   @UseGuards(AtGuard)
@@ -76,7 +78,10 @@ export class AuthController {
   ) {
     // xoa cookie di
     res.cookie('token', '');
-    return await this.authService.logout(userId);
+    const data = await this.authService.logout(userId);
+    return {
+      data: data,
+    };
   }
 
   @Public()
@@ -92,7 +97,10 @@ export class AuthController {
     console.log(refreshToken);
     const user = req.user['data']['sub'];
     const token = req.cookies.token;
-    return this.authService.refreshTokens(Number(user), token);
+    const data = this.authService.refreshTokens(Number(user), token);
+    return {
+      data: data,
+    };
   }
 
   @Get('/profile')
@@ -112,7 +120,10 @@ export class AuthController {
   @Get('/reset-password/:email')
   async sendMailtoResetPassword(@Param('email') email: string) {
     console.log(email);
-    return this.authService.sendEmailchangePassword(email);
+    const data = this.authService.sendEmailchangePassword(email);
+    return {
+      data,
+    };
   }
   @Public()
   @Put('reset/:id')
@@ -120,6 +131,9 @@ export class AuthController {
     @Param('id') id: string,
     @Body('password') password: string,
   ) {
-    return this.authService.changePassword(Number(id), password);
+    const data = this.authService.changePassword(Number(id), password);
+    return {
+      data,
+    };
   }
 }

@@ -36,17 +36,19 @@ export class AuthService {
     return tokens;
   }
   async signinpLocal(dto: AuthDto): Promise<Tokens> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: dto.email,
-      },
-    });
-    if (!user) throw new ForbiddenException('access denied');
-    const passwordMatched = await bcrypt.compare(dto.password, user.hash);
-    if (!passwordMatched) throw new ForbiddenException('access denied');
-    const tokens = await this.getTokens(user.id, user.email, user.role);
-    await this.updateRtHash(user.id, tokens.refresh_token);
-    return tokens;
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email: dto.email,
+        },
+      });
+      if (!user) throw new ForbiddenException('access denied');
+      const passwordMatched = await bcrypt.compare(dto.password, user.hash);
+      if (!passwordMatched) throw new ForbiddenException('access denied');
+      const tokens = await this.getTokens(user.id, user.email, user.role);
+      await this.updateRtHash(user.id, tokens.refresh_token);
+      return tokens;
+    } catch (error) {}
   }
   async logout(userId: number) {
     await this.prisma.user.updateMany({

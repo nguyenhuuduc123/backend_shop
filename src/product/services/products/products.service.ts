@@ -36,11 +36,21 @@ export class ProductService {
           price: dto.orderby == 'true' ? 'asc' : 'desc',
         },
         include: {
-          evaluate: true,
-          orders: true,
-          categorys: {
+          evaluate: {
             include: {
-              CategoryProduct: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  avatar: true,
+                },
+              },
+            },
+          },
+          orders: true,
+          categoryProduct: {
+            include: {
+              categoryProductDetail: true,
             },
           },
           productImages: true,
@@ -59,9 +69,9 @@ export class ProductService {
         },
         include: {
           orders: true,
-          categorys: {
+          categoryProduct: {
             include: {
-              CategoryProduct: true,
+              categoryProductDetail: true,
             },
           },
         },
@@ -93,5 +103,4 @@ export class ProductService {
       throw new BadRequestException('something went wrong or id not found');
     }
   }
-  // find product theo ten , order
 }

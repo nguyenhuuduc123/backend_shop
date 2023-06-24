@@ -15,6 +15,7 @@ import { CategoryProductModule } from './category-product/category-product.modul
 import { MailerModule } from '@nest-modules/mailer';
 import { OrderProductModule } from './order-product/order-product.module';
 import { StripeModule } from './stripe/stripe.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { StripeModule } from './stripe/stripe.module';
     CategoryProductModule,
     OrderProductModule,
     StripeModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [

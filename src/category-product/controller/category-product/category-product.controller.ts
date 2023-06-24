@@ -33,19 +33,28 @@ export class CategoryProductController {
     @Body() updateCategory: UpdateCategoryDto,
     @Param('id') id: string,
   ) {
-    return this.categoryService.updateCategoryProduct(
+    const data = await this.categoryService.updateCategoryProduct(
       Number(id),
       Number(updateCategory.productId),
     );
+    return {
+      data,
+    };
   }
   @Roles(Role.ADMIN, Role.USER)
   @UseGuards(RolesGuard)
   @Put('edit/:id')
   async editCategory(@Body() edit: EditCategoryDto, @Param('id') id: string) {
-    return this.categoryService.updateCategory(Number(id), edit);
+    const data = await this.categoryService.updateCategory(Number(id), edit);
+    return {
+      data,
+    };
   }
   @Get('filter')
   async getallProductByCategory(@Query() query: QueryCategoryDto) {
-    return this.categoryService.getallProductByCate(query);
+    const data = await this.categoryService.getallProductByCate(query);
+    return {
+      data,
+    };
   }
 }

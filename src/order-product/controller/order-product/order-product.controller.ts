@@ -7,6 +7,9 @@ export class OrderProductController {
   constructor(private orderProductService: OrderProductService) {}
   @Post()
   async createOrderDto(@Body() dto: OrderProductDto) {
-    return this.orderProductService.createOrderProduct(dto);
+    const data = await this.orderProductService.createOrderProduct(dto);
+    return {
+      data,
+    };
   }
 }

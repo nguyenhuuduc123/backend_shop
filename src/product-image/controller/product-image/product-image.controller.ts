@@ -19,14 +19,16 @@ export class ProductImageController {
     @UploadedFile() file: Express.Multer.File,
     @Body('productId') productId: string,
   ) {
-    return await this.productImageService.createImageProduct(
+    const data = await this.productImageService.createImageProduct(
       file,
       Number(productId),
     );
+    return { data };
   }
   @Delete(':productId')
   async deleteProfile(@Param('productId') id: string) {
-    return this.productImageService.deleteProductImage(Number(id));
+    const data = await this.productImageService.deleteProductImage(Number(id));
+    return { data };
   }
   @Post('createMany')
   @UseInterceptors(FileInterceptor('file'))
@@ -34,10 +36,17 @@ export class ProductImageController {
     @UploadedFile() files: Express.Multer.File[],
     @Body('productId') productId: string,
   ) {
-    return await this.productImageService.createMany(Number(productId), files);
+    const data = await this.productImageService.createMany(
+      Number(productId),
+      files,
+    );
+    return { data };
   }
   @Delete('deletemany/:productId')
   async deleteAllImage(@Param('productId') id: string) {
-    return this.productImageService.deleteManyProductImage(Number(id));
+    const data = await this.productImageService.deleteManyProductImage(
+      Number(id),
+    );
+    return { data };
   }
 }

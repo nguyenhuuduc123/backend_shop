@@ -27,25 +27,37 @@ export class EvaluateController {
     @Body() dto: CreateEvaluateDto,
     @GetCurrentUserIdByAT('sub') userId: string,
   ) {
-    return await this.evaluateService.createEvalue(dto, Number(userId));
+    const data = await this.evaluateService.createEvalue(dto, Number(userId));
+    return {
+      data,
+    };
   }
   @Roles(Role.ADMIN, Role.USER)
   @UseGuards(RolesGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteEvaluate(@Param('id') id: string) {
-    return this.evaluateService.deleteEvaluate(Number(id));
+    const data = await this.evaluateService.deleteEvaluate(Number(id));
+    return {
+      data,
+    };
   }
   @Roles(Role.ADMIN, Role.USER)
   @UseGuards(RolesGuard)
   @Put(':id')
   async updateProduct(@Body() dto: UpdateEvaluateDto, @Param('id') id: string) {
-    return await this.evaluateService.updateEvaluate(Number(id), dto);
+    const data = await this.evaluateService.updateEvaluate(Number(id), dto);
+    return {
+      data,
+    };
   }
   @Roles(Role.ADMIN, Role.USER)
   @UseGuards(RolesGuard)
   @Get('allEvaluate')
   async getAllEvaluate(@GetCurrentUserIdByAT('sub') userId: string) {
-    return await this.evaluateService.getAllEvaluate(Number(userId));
+    const data = await this.evaluateService.getAllEvaluate(Number(userId));
+    return {
+      data,
+    };
   }
 }

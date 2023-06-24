@@ -24,7 +24,7 @@ export class UserService {
         isBlocked: false,
       },
       include: {
-        Order: true,
+        order: true,
       },
     });
   }
@@ -34,7 +34,7 @@ export class UserService {
         id: id,
       },
       include: {
-        Order: true,
+        order: true,
       },
     });
   }
@@ -167,7 +167,7 @@ export class UserService {
           isBlocked: false,
         },
         include: {
-          Order: true,
+          order: true,
         },
       });
     } catch (error) {}

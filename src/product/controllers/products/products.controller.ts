@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
+import { Public } from 'src/common/decorators';
 
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -31,18 +32,23 @@ export class ProductsController {
     return await this.productService.createProduct(dto);
   }
 
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
+  @Public()
   @Get('all')
-  async getAllproduct(@Query() dto: QueryTypeDto) {
+  async getAllProduct(@Query() dto: QueryTypeDto) {
     console.log(dto.orderby);
-    return this.productService.getAllProduct(dto);
+    const data = await this.productService.getAllProduct(dto);
+    return {
+      data,
+    };
   }
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @Get(':id')
   async getProductById(@Param('id') id: string) {
-    return this.productService.getProductById(Number(id));
+    const data = await this.productService.getProductById(Number(id));
+    return {
+      data,
+    };
   }
 
   @Roles(Role.ADMIN)
@@ -52,7 +58,13 @@ export class ProductsController {
     @Body() updateProductDto: UpdateProductDto,
     @Param('id') id: string,
   ) {
-    return this.productService.updateProduct(Number(id), updateProductDto);
+    const data = await this.productService.updateProduct(
+      Number(id),
+      updateProductDto,
+    );
+    return {
+      data,
+    };
   }
 
   @Roles(Role.ADMIN)
@@ -60,6 +72,9 @@ export class ProductsController {
   @Delete(':id')
   @HttpCode(204)
   async deleteProduct(@Param('id') id: string) {
-    return await this.productService.deleteProduct(Number(id));
+    const data = await this.productService.deleteProduct(Number(id));
+    return {
+      data,
+    };
   }
 }

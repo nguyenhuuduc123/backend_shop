@@ -3,6 +3,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from '../../dtos';
 import { UpdateOrderDto } from 'src/order/dtos/update.order.dto';
 import { ProductType } from 'src/order/dtos/product.type';
+import { CreateCartDto } from 'src/order/dtos/create.cart.dto';
+import { ConvertSize } from 'src/utils/convertSize';
+import { ConvertColor } from 'src/utils/convertColor';
 
 @Injectable()
 export class OrderService {
@@ -47,6 +50,7 @@ export class OrderService {
         paied: createDto.paied,
         ordered: createDto.ordered,
         userId: userId,
+        flat: false,
         products: {
           createMany: {
             data: kq,
@@ -216,6 +220,123 @@ export class OrderService {
       },
     });
   }
+  // cart
+  async createCart(userId: number, createDto: CreateCartDto) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) throw new BadRequestException('user not found');
+
+      const cart1 = await this.prisma.order.findMany({
+        where: {
+          flat: true,
+        },
+      });
+      if (cart1.length == 0) {
+        const cart = await this.prisma.order.create({
+          data: {
+            orderStatus: createDto.orderStatus,
+            paied: createDto.paied,
+            ordered: createDto.ordered,
+            userId: userId,
+            flat: true,
+          },
+        });
+        if (createDto.productId != null) {
+          //get combo size, color, quantitty by san pham
+          const kq = await this.getCategoryByProduct(createDto.productId);
+          console.log(kq);
+          const data = await this.prisma.order.update({
+            where: {
+              id: cart.id,
+            },
+            data: {
+              products: {
+                create: {
+                  numberOf: createDto.numberOf,
+                  size: createDto.size,
+                  color: createDto.color,
+                  product: {
+                    connect: {
+                      id: createDto.productId,
+                    },
+                  },
+                },
+              },
+            },
+          });
+          return data;
+        }
+      } else {
+        const data = await this.prisma.order.update({
+          where: {
+            id: cart1[0].id,
+          },
+          data: {
+            products: {
+              create: {
+                numberOf: createDto.numberOf,
+                size: createDto.size,
+                color: createDto.color,
+                product: {
+                  connect: {
+                    id: createDto.productId,
+                  },
+                },
+              },
+            },
+          },
+        });
+        return data;
+      }
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+  async getCategoryByProduct(productId: number) {
+    const productF = await this.prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+      include: {
+        categoryProduct: {
+          include: {
+            categoryProductDetail: {
+              select: {
+                colors: true,
+                size: true,
+                quantity: true,
+                remainAmount: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return productF;
+  }
+  async getCartByUserid(userid: number) {
+    try {
+      const orderAll = await this.prisma.order.findMany({
+        where: {
+          flat: true,
+          userId: userid,
+        },
+        include: {
+          products: {
+            select: {
+              color: true,
+              size: true,
+              numberOf: true,
+              totalPrice: true,
+            },
+          },
+        },
+      });
+      return orderAll;
+    } catch (error) {}
+  }
 }
-// flat == true , flat = false
-// get all order by userid : history order
