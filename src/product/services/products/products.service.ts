@@ -1,19 +1,19 @@
-import { QueryTypeDto } from './../../dtos/queryType.dto';
+import { QueryTypeDto } from '../../dto/queryType.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateProductDto } from '../../dtos/create.product.dto';
-import { UpdateProductDto } from 'src/product/dtos/update.product.dto';
+import { CreateProductDto } from '../../dto/create.product.dto';
+import { UpdateProductDto } from 'src/product/dto/update.product.dto';
 import { convertProductDto } from 'src/utils/convertProductDto';
 
 @Injectable()
 export class ProductService {
   constructor(private prisma: PrismaService) {}
   // create product
-  async createProduct(createproductDto: CreateProductDto) {
+  async createProduct(createProductDto: CreateProductDto) {
     try {
       return this.prisma.product.create({
         data: {
-          ...createproductDto,
+          ...createProductDto,
         },
       });
     } catch (error) {
@@ -69,6 +69,8 @@ export class ProductService {
         },
         include: {
           orders: true,
+          productImages: true,
+          evaluate: true,
           categoryProduct: {
             include: {
               categoryProductDetail: true,
@@ -101,6 +103,19 @@ export class ProductService {
       });
     } catch (error) {
       throw new BadRequestException('something went wrong or id not found');
+    }
+  }
+  async queryProduct(productName: string) {
+    try {
+      return await this.prisma.product.findMany({
+        where: {
+          productName: {
+            contains: productName != null ? productName : undefined,
+          },
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException('error');
     }
   }
 }

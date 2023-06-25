@@ -6,11 +6,11 @@ import { Request } from 'express';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class RtStratety extends PassportStrategy(Strategy, 'jwt-refresh') {
+export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   constructor(private jwtService: JwtService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        RtStratety.extractJWT,
+        RtStrategy.extractJWT,
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       secretOrKey: 'rt-secret',
@@ -24,10 +24,7 @@ export class RtStratety extends PassportStrategy(Strategy, 'jwt-refresh') {
     return null;
   }
   validate(payload: any) {
-    //console.log(payload);
     const data = this.jwtService.decode(payload.cookies.token);
-    //console.log(data);
-    //  console.log(payload.cookies.token);
     return {
       ...payload.cookies.token,
       data,

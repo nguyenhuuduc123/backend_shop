@@ -10,12 +10,12 @@ import {
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
 
-import { GetCurrentUserIdByAT } from 'src/common/decorators/get-userid-at.decorator';
+import { GetCurrentUserIdByAT } from 'src/common/decorators/get-userId-at.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { CreateOrderDto } from 'src/order/dtos';
-import { CreateCartDto } from 'src/order/dtos/create.cart.dto';
-import { UpdateOrderDto } from 'src/order/dtos/update.order.dto';
+import { CreateOrderDto } from 'src/order/dto';
+import { CreateCartDto } from 'src/order/dto/create.cart.dto';
+import { UpdateOrderDto } from 'src/order/dto/update.order.dto';
 import { OrderService } from 'src/order/service/order/order.service';
 
 @Controller('order')
@@ -27,9 +27,9 @@ export class OrderController {
   async createOrder(
     @Body() dto: CreateOrderDto,
 
-    @GetCurrentUserIdByAT('sub') userid: string,
+    @GetCurrentUserIdByAT('sub') userId: string,
   ) {
-    const data = await this.orderService.createOrder(Number(userid), dto);
+    const data = await this.orderService.createOrder(Number(userId), dto);
     return {
       data,
     };
@@ -65,7 +65,7 @@ export class OrderController {
   async deleteOrder(@Param('id') id: string) {
     const data = await this.orderService.removeOrder(Number(id));
     return {
-      messsage: 'thanh cong',
+      message: 'thanh cong',
       data: data,
     };
   }
@@ -84,17 +84,17 @@ export class OrderController {
   async createCart(
     @Body() dto: CreateCartDto,
 
-    @GetCurrentUserIdByAT('sub') userid: string,
+    @GetCurrentUserIdByAT('sub') userId: string,
   ) {
-    const data = await this.orderService.createCart(Number(userid), dto);
+    const data = await this.orderService.createCart(Number(userId), dto);
     return {
       data,
     };
   }
 
   @Get('cart')
-  async getCartByUserId(@GetCurrentUserIdByAT('sub') userid: string) {
-    const data = await this.orderService.getCartByUserid(Number(userid));
+  async getCartByUserId(@GetCurrentUserIdByAT('sub') userId: string) {
+    const data = await this.orderService.getCartByUserId(Number(userId));
     return {
       data,
     };

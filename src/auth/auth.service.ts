@@ -9,7 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { Tokens } from './types';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
-import { RegiserUserDto } from './dto/register.dto';
+import { RegisterUserDto } from './dto/register.dto';
 import { MailerService } from '@nest-modules/mailer';
 @Injectable()
 export class AuthService {
@@ -19,7 +19,7 @@ export class AuthService {
     private mailService: MailerService,
   ) {}
 
-  async signupLocal(dto: RegiserUserDto): Promise<Tokens> {
+  async signupLocal(dto: RegisterUserDto): Promise<Tokens> {
     const hash = await this.hashData(dto.hash);
     const user = await this.prisma.user.create({
       data: {
@@ -35,7 +35,7 @@ export class AuthService {
     await this.updateRtHash(user.id, tokens.refresh_token);
     return tokens;
   }
-  async signinpLocal(dto: AuthDto): Promise<Tokens> {
+  async signInLocal(dto: AuthDto): Promise<Tokens> {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
@@ -126,7 +126,7 @@ export class AuthService {
     });
   }
   // change password
-  async sendEmailchangePassword(email: string) {
+  async sendEmailChangePassword(email: string) {
     // find user by email
     const user = await this.prisma.user.findUnique({
       where: {
@@ -134,29 +134,27 @@ export class AuthService {
       },
     });
     if (user != null && user.isBlocked == true)
-      throw new BadRequestException('user da bi chan hoac khong ton tai email');
+      throw new BadRequestException('user isBlock or no find');
 
-    const content = `<form method="post" >
-    <input type="hidden" name="password" value="password" />
-    <a href="http://localhost:3000/api/auth/reset/${user.id}">click here</a>
-    </form> `;
+    const content = `=
+    <a href="http://localhost:3000/api/auth/reset/${user.id}">click here</a> `;
     this.mailService.sendMail({
       to: email,
-      from: '"nguyenhuuduc  👻" <duccccnguyen@gmail.com>',
+      from: '"nguyen huu duc  👻" <duccccnguyen@gmail.com>',
       subject: 'change password',
-      text: 'welocom',
+      text: 'welcome',
       html: content,
     });
   }
   async changePassword(userId: number, password: string) {
     // hash
-    const hashp = await this.hashData(password);
+    const hashP = await this.hashData(password);
     await this.prisma.user.update({
       where: {
         id: userId,
       },
       data: {
-        hash: hashp,
+        hash: hashP,
       },
     });
     return {

@@ -1,6 +1,6 @@
 export class UpdateOrderDto {
   orderStatus: string;
-  paied: boolean;
+  paid: boolean;
   ordered: boolean;
   productIds: number[];
   numberOf: number[];

@@ -14,11 +14,11 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Role } from '@prisma/client';
 
-import { GetCurrentUserIdByAT } from 'src/common/decorators/get-userid-at.decorator';
+import { GetCurrentUserIdByAT } from 'src/common/decorators/get-userId-at.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { EditUserDto } from 'src/user/dtos/edit.user.dto';
-import { QueryUserDto } from 'src/user/dtos/query.user.dto';
+import { EditUserDto } from 'src/user/dto/edit.user.dto';
+import { QueryUserDto } from 'src/user/dto/query.user.dto';
 import { UserService } from 'src/user/service/user/user.service';
 
 @Controller('user')
@@ -37,7 +37,10 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Get('getbyid/:id')
   async getUserById(@Param('id') id: string) {
-    return await this.userService.getUserById(Number(id));
+    const data = await this.userService.getUserById(Number(id));
+    return {
+      data,
+    };
   }
   @Roles(Role.ADMIN, Role.USER)
   @UseGuards(RolesGuard)
@@ -47,39 +50,64 @@ export class UserController {
     @GetCurrentUserIdByAT('sub') id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.userService.uploadAvatarUser(Number(id), file);
+    const data = await this.userService.uploadAvatarUser(Number(id), file);
+    return {
+      data,
+    };
   }
 
   @Delete('delete-avatar')
   async deleteProfile(@GetCurrentUserIdByAT('sub') id: string) {
-    return this.userService.deleteAvatar(Number(id));
+    const data = await this.userService.deleteAvatar(Number(id));
+    return {
+      data,
+      message: 'delete finished',
+    };
   }
 
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @Post('blockUser')
   async blockUser(@Body('userId') id: string) {
-    return this.userService.blockUserById(Number(id));
+    const data = this.userService.blockUserById(Number(id));
+    return {
+      data,
+    };
   }
 
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @Post('unblockUser')
   async unBlockUser(@Body('userId') id: string) {
-    return this.userService.unBlockUserById(Number(id));
+    const data = await this.userService.unBlockUserById(Number(id));
+    return {
+      data,
+    };
   }
-  // xem thong tin ca nhan
+
   @Roles(Role.ADMIN, Role.USER)
   @UseGuards(RolesGuard)
   @Get('individual')
   async getInformationIndividual(@GetCurrentUserIdByAT('sub') id: string) {
-    return this.userService.getUserById(Number(id));
+    const data = await this.userService.getUserById(Number(id));
+    return {
+      data,
+    };
   }
-  @Put('editInfomation/:id')
+
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
+  @Put('editInformation/:id')
   async updateInformation(
     @Param('id') id: string,
     @Body() editUserDto: EditUserDto,
   ) {
-    return this.userService.editInfomation(Number(id), editUserDto);
+    const data = await this.userService.editInformation(
+      Number(id),
+      editUserDto,
+    );
+    return {
+      data,
+    };
   }
 }

@@ -55,7 +55,7 @@ model Order {
   id Int @id @default(autoincrement())
   orderStatus String
   paymentMethod PAYMENTMETHOD @default(DIRECT)
-  paied Boolean
+  paid Boolean @default(false)
   ordered Boolean
   userId Int
   paymentDate DateTime @default(now())

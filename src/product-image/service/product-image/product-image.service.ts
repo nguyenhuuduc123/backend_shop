@@ -42,7 +42,7 @@ export class ProductImageService {
     try {
       if (files) {
         const images = await this.cloudinary.uploadImages(files).catch((e) => {
-          throw new BadRequestException(e.message);
+          throw new BadRequestException('1' + e.message);
         });
         if (images) {
           images.forEach(async (img) => {
@@ -57,7 +57,7 @@ export class ProductImageService {
         }
       }
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException('2' + error);
     }
   }
   async deleteManyProductImage(productId: number) {

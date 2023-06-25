@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateOrderDto } from '../../dtos';
-import { UpdateOrderDto } from 'src/order/dtos/update.order.dto';
-import { ProductType } from 'src/order/dtos/product.type';
-import { CreateCartDto } from 'src/order/dtos/create.cart.dto';
+import { CreateOrderDto } from '../../dto';
+import { UpdateOrderDto } from 'src/order/dto/update.order.dto';
+import { ProductType } from 'src/order/dto/product.type';
+import { CreateCartDto } from 'src/order/dto/create.cart.dto';
 import { ConvertSize } from 'src/utils/convertSize';
 import { ConvertColor } from 'src/utils/convertColor';
 
@@ -11,14 +11,14 @@ import { ConvertColor } from 'src/utils/convertColor';
 export class OrderService {
   constructor(private prisma: PrismaService) {}
   async createOrder(userId: number, createDto: CreateOrderDto) {
-    // check user exits chua
-    const userExsit = await this.prisma.user.findUnique({
+    // check user exits
+    const userExist = await this.prisma.user.findUnique({
       where: {
         id: userId,
       },
     });
-    if (!userExsit && userExsit.isBlocked == true)
-      throw new BadRequestException('id khong khong hop hoac user da bi chan');
+    if (!userExist && userExist.isBlocked == true)
+      throw new BadRequestException('id not found or user blocked');
 
     const kq: ProductType[] = [];
     for (let i = 0; i < createDto.productIds.length; i++) {
@@ -27,13 +27,10 @@ export class OrderService {
           id: createDto.productIds[i],
         },
       });
-      if (!queryProduct)
-        throw new BadRequestException('productid khong ton tai');
+      if (!queryProduct) throw new BadRequestException('productId not found');
       if (queryProduct.quantitySold < createDto.numberOf[i])
-        throw new BadRequestException(
-          'so luong order phaienho hon so luong trong kho',
-        );
-      const totalprice =
+        throw new BadRequestException('quantity must be ');
+      const totalPrice =
         queryProduct.price *
         createDto.numberOf[i] *
         queryProduct.discount *
@@ -41,13 +38,15 @@ export class OrderService {
       kq.push({
         productId: createDto.productIds[i],
         numberOf: createDto.numberOf[i],
-        totalPrice: totalprice,
+        totalPrice: totalPrice,
+        size: createDto.size[i],
+        color: createDto.color[i],
       });
     }
     const orderByUser = await this.prisma.order.create({
       data: {
         orderStatus: createDto.orderStatus,
-        paied: createDto.paied,
+        paid: createDto.paid,
         ordered: createDto.ordered,
         userId: userId,
         flat: false,
@@ -59,16 +58,14 @@ export class OrderService {
       },
     });
     if (orderByUser) {
-      // cap nhap lai so san pham
       for (let i = 0; i < createDto.productIds.length; i++) {
         const queryProduct = await this.prisma.product.findUnique({
           where: {
             id: createDto.productIds[i],
           },
         });
-        if (!queryProduct)
-          throw new BadRequestException('productid khong ton tai');
-        // cap nhap lai so luong
+        if (!queryProduct) throw new BadRequestException('productId not found');
+
         await this.prisma.product.update({
           where: {
             id: createDto.productIds[i],
@@ -104,7 +101,7 @@ export class OrderService {
         },
       });
       for (let i = 0; i < orderProducts.length; i++) {
-        this.updateProductAffterDeteleOrder(
+        this.updateProductAfterDeleteOrder(
           orderProducts[i].numberOf,
           orderProducts[i].productId,
         );
@@ -138,7 +135,7 @@ export class OrderService {
       },
       data: {
         orderStatus: updateOrderDto.orderStatus,
-        paied: updateOrderDto.paied,
+        paid: updateOrderDto.paid,
         ordered: updateOrderDto.ordered,
       },
     });
@@ -174,7 +171,7 @@ export class OrderService {
     return u;
   }
   // add product into order
-  async updateProductAffterDeteleOrder(quantity: number, productId: number) {
+  async updateProductAfterDeleteOrder(quantity: number, productId: number) {
     // find product
     try {
       const findProduct = await this.prisma.product.findUnique({
@@ -184,7 +181,7 @@ export class OrderService {
       });
       // if khong ton tai , tra ve loi,
       if (!findProduct) {
-        throw new BadRequestException('khong tin thay san pham');
+        throw new BadRequestException('not found product info');
       }
       await this.prisma.product.update({
         where: {
@@ -239,19 +236,52 @@ export class OrderService {
         const cart = await this.prisma.order.create({
           data: {
             orderStatus: createDto.orderStatus,
-            paied: createDto.paied,
+            paid: createDto.paid,
             ordered: createDto.ordered,
             userId: userId,
             flat: true,
           },
         });
         if (createDto.productId != null) {
-          //get combo size, color, quantitty by san pham
           const kq = await this.getCategoryByProduct(createDto.productId);
-          console.log(kq);
-          const data = await this.prisma.order.update({
+          if (
+            kq.colors.includes(ConvertColor.convertColor(createDto.color)) &&
+            kq.sizes.includes(ConvertSize.convertSize(createDto.size))
+          ) {
+            console.log(kq);
+            await this.prisma.order.update({
+              where: {
+                id: cart.id,
+              },
+              data: {
+                products: {
+                  create: {
+                    numberOf: createDto.numberOf,
+                    size: createDto.size,
+                    color: createDto.color,
+                    product: {
+                      connect: {
+                        id: createDto.productId,
+                      },
+                    },
+                  },
+                },
+              },
+            });
+            return {
+              message: 'create order success',
+            };
+          }
+        }
+      } else {
+        const kq = await this.getCategoryByProduct(createDto.productId);
+        if (
+          kq.colors.includes(ConvertColor.convertColor(createDto.color)) &&
+          kq.sizes.includes(ConvertSize.convertSize(createDto.size))
+        ) {
+          await this.prisma.order.update({
             where: {
-              id: cart.id,
+              id: cart1[0].id,
             },
             data: {
               products: {
@@ -268,29 +298,10 @@ export class OrderService {
               },
             },
           });
-          return data;
+          return {
+            message: 'update success',
+          };
         }
-      } else {
-        const data = await this.prisma.order.update({
-          where: {
-            id: cart1[0].id,
-          },
-          data: {
-            products: {
-              create: {
-                numberOf: createDto.numberOf,
-                size: createDto.size,
-                color: createDto.color,
-                product: {
-                  connect: {
-                    id: createDto.productId,
-                  },
-                },
-              },
-            },
-          },
-        });
-        return data;
       }
     } catch (error) {
       throw new BadRequestException(error);
@@ -316,14 +327,21 @@ export class OrderService {
         },
       },
     });
-    return productF;
+    return {
+      colors: productF.categoryProduct.map(
+        (value) => value.categoryProductDetail.colors,
+      ),
+      sizes: productF.categoryProduct.map(
+        (value) => value.categoryProductDetail.size,
+      ),
+    };
   }
-  async getCartByUserid(userid: number) {
+  async getCartByUserId(userId: number) {
     try {
       const orderAll = await this.prisma.order.findMany({
         where: {
           flat: true,
-          userId: userid,
+          userId: userId,
         },
         include: {
           products: {

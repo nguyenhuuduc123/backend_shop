@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { QueryUserDto } from 'src/user/dtos/query.user.dto';
-import { EditUserDto } from 'src/user/dtos/edit.user.dto';
+import { QueryUserDto } from 'src/user/dto/query.user.dto';
+import { EditUserDto } from 'src/user/dto/edit.user.dto';
 import { convertUserDto } from 'src/utils/convertUserDto';
 
 @Injectable()
@@ -172,9 +172,9 @@ export class UserService {
       });
     } catch (error) {}
   }
-  async editInfomation(userId: number, editDto: EditUserDto) {
+  async editInformation(userId: number, editDto: EditUserDto) {
     try {
-      await this.prisma.user.update({
+      return await this.prisma.user.update({
         where: {
           id: userId,
         },

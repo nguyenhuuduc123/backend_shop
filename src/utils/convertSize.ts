@@ -1,12 +1,3 @@
-// enum SIZE {
-//     XS
-//     S
-//     M
-//     L
-//     XL
-//     XXL
-//   }
-
 import { SIZE } from '@prisma/client';
 
 export class ConvertSize {

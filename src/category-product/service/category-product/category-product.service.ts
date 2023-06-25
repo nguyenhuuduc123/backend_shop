@@ -13,10 +13,10 @@ export class CategoryProductService {
   async createCategory(dto: CreateCategoryDto) {
     //
     if (ConvertColor.convertColor(dto.color) == null) {
-      throw new BadRequestException('nhap mau chua phu hop');
+      throw new BadRequestException('error size');
     }
     if (ConvertSize.convertSize(dto.size) == null) {
-      throw new BadRequestException('nhap size chua phu hop');
+      throw new BadRequestException('error size');
     }
     return await this.prisma.categoryProductDetail.create({
       data: {
@@ -66,18 +66,18 @@ export class CategoryProductService {
         },
       });
       return {
-        message: 'update thanh cong',
+        message: 'update successful',
       };
     } catch (error) {
-      throw new BadRequestException('update khong thanh cong');
+      throw new BadRequestException('update fail');
     }
   }
   async getallProductByCate(query: QueryCategoryDto) {
     if (ConvertColor.convertColor(query.color) == null) {
-      throw new BadRequestException('nhap mau chua phu hop');
+      throw new BadRequestException('error Color');
     }
     if (ConvertSize.convertSize(query.size) == null) {
-      throw new BadRequestException('nhap size chua phu hop');
+      throw new BadRequestException('error Size');
     }
     try {
       const query1 = await this.prisma.categoryProductDetail.findMany({

@@ -1,4 +1,4 @@
-import { EditUserDto } from 'src/user/dtos/edit.user.dto';
+import { EditUserDto } from 'src/user/dto/edit.user.dto';
 
 export function convertUserDto(edit: EditUserDto) {
   return {

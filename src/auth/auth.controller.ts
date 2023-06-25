@@ -1,5 +1,6 @@
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -26,7 +27,7 @@ import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Tokens } from './types';
-import { RegiserUserDto } from './dto/register.dto';
+import { RegisterUserDto } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -36,7 +37,7 @@ export class AuthController {
   @Post('/local/signup')
   @HttpCode(HttpStatus.CREATED)
   async signupLocal(
-    @Body() dto: RegiserUserDto,
+    @Body() dto: RegisterUserDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<Tokens> {
     const data = await this.authService.signupLocal(dto);
@@ -44,29 +45,31 @@ export class AuthController {
     const { refresh_token } = data;
 
     console.log(refresh_token);
-    // thiet lap cookie cho trinh duyet
+
     res.cookie('token', refresh_token);
     return data;
   }
 
   @Public()
-  @Post('/local/signin')
+  @Post('/local/signIn')
   @HttpCode(HttpStatus.OK)
-  async signinLocal(
+  async signInLocal(
     @Body() dto: AuthDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const data = await this.authService.signinpLocal(dto);
-    console.log(111);
-    const { refresh_token } = data;
-    console.log(refresh_token);
-    // xoa token cu neu co
-    res.cookie('token', '');
-    // thiet lap cookie cho trinh duyet
-    res.cookie('token', refresh_token);
-    return {
-      data: data,
-    };
+    try {
+      const data = await this.authService.signInLocal(dto);
+      console.log(111);
+      const { refresh_token } = data;
+      console.log(refresh_token);
+      res.cookie('token', '');
+      res.cookie('token', refresh_token);
+      return {
+        data: data,
+      };
+    } catch (error) {
+      throw new BadRequestException('Incorrect email or password');
+    }
   }
 
   @UseGuards(AtGuard)
@@ -88,7 +91,7 @@ export class AuthController {
   @UseGuards(RtGuard)
   @Post('/refresh')
   @HttpCode(HttpStatus.OK)
-  refreshtoken(
+  refreshToken(
     @GetCurrentUserId('sub') userId: string,
     @GetCurrentUser() refreshToken: string,
     @Req() req: Request,
@@ -104,14 +107,14 @@ export class AuthController {
   }
 
   @Get('/profile')
-  getprofileUser(@Req() req: Request) {
+  getProfileUser(@Req() req: Request) {
     console.log(1111);
     return req.user;
   }
 
   @Roles(Role.ADMIN)
   @UseGuards(AtGuard, RolesGuard)
-  @Get('myname')
+  @Get('myName')
   getMyName(@Req() req: Request) {
     console.log(req.user);
     return req.user;
@@ -120,7 +123,7 @@ export class AuthController {
   @Get('/reset-password/:email')
   async sendMailtoResetPassword(@Param('email') email: string) {
     console.log(email);
-    const data = this.authService.sendEmailchangePassword(email);
+    const data = this.authService.sendEmailChangePassword(email);
     return {
       data,
     };

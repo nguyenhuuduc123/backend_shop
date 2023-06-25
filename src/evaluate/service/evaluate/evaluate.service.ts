@@ -36,7 +36,7 @@ export class EvaluateService {
   }
   async updateEvaluate(evaluateId: number, dto: UpdateEvaluateDto) {
     try {
-      const evalue = await this.prisma.evaluate.update({
+      const evaluate = await this.prisma.evaluate.update({
         where: {
           id: evaluateId,
         },
@@ -46,7 +46,7 @@ export class EvaluateService {
           productId: dto.productId ? dto.productId : undefined,
         },
       });
-      return evalue;
+      return evaluate;
     } catch (error) {
       throw new BadRequestException('some thing went wrong');
     }

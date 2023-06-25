@@ -1,4 +1,4 @@
-import { UpdateProductDto } from 'src/product/dtos/update.product.dto';
+import { UpdateProductDto } from 'src/product/dto/update.product.dto';
 
 export function convertProductDto(updateProductDto: UpdateProductDto) {
   return {
