@@ -78,6 +78,7 @@ export class OrderController {
       data,
     };
   }
+
   @Roles(Role.ADMIN, Role.USER)
   @UseGuards(RolesGuard)
   @Post('cart')
@@ -92,9 +93,21 @@ export class OrderController {
     };
   }
 
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
   @Get('cart')
   async getCartByUserId(@GetCurrentUserIdByAT('sub') userId: string) {
     const data = await this.orderService.getCartByUserId(Number(userId));
+    return {
+      data,
+    };
+  }
+
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
+  @Get('user')
+  async getOrderByUserId(@GetCurrentUserIdByAT('sub') userId: string) {
+    const data = await this.orderService.getOrderByUserId(Number(userId));
     return {
       data,
     };

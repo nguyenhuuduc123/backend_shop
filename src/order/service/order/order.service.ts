@@ -112,7 +112,7 @@ export class OrderService {
           },
         });
         if (!orderDelete1)
-          throw new BadRequestException('khong tin thay san pham xoa');
+          throw new BadRequestException('not found product deleted');
       }
     }
   }
@@ -341,6 +341,27 @@ export class OrderService {
       const orderAll = await this.prisma.order.findMany({
         where: {
           flat: true,
+          userId: userId,
+        },
+        include: {
+          products: {
+            select: {
+              color: true,
+              size: true,
+              numberOf: true,
+              totalPrice: true,
+            },
+          },
+        },
+      });
+      return orderAll;
+    } catch (error) {}
+  }
+  async getOrderByUserId(userId: number) {
+    try {
+      const orderAll = await this.prisma.order.findMany({
+        where: {
+          flat: false,
           userId: userId,
         },
         include: {
