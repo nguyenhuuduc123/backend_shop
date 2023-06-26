@@ -65,6 +65,35 @@ export class OrderService {
           },
         });
         if (!queryProduct) throw new BadRequestException('productId not found');
+        // delte from gio hang
+        //
+        const findProduct = await this.prisma.order.findMany({
+          where: {
+            flat: true,
+          },
+          include: {
+            products: {
+              include: {
+                product: true,
+              },
+            },
+          },
+        });
+        findProduct[0].products.forEach(async (value) => {
+          //
+          console.log(createDto.color.includes(value.color));
+          console.log(createDto.color.includes(value.size));
+          if (
+            createDto.color.includes(value.color) &&
+            createDto.size.includes(value.size)
+          ) {
+            await this.prisma.orderOnProducts.delete({
+              where: {
+                id: value.id,
+              },
+            });
+          }
+        });
 
         await this.prisma.product.update({
           where: {
@@ -349,7 +378,13 @@ export class OrderService {
               color: true,
               size: true,
               numberOf: true,
-              totalPrice: true,
+              // totalPrice: true,
+              product: {
+                select: {
+                  productName: true,
+                  price: true,
+                },
+              },
             },
           },
         },
@@ -370,7 +405,13 @@ export class OrderService {
               color: true,
               size: true,
               numberOf: true,
-              totalPrice: true,
+              product: {
+                select: {
+                  productName: true,
+                  price: true,
+                },
+              },
+              //  totalPrice: true,
             },
           },
         },

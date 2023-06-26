@@ -42,6 +42,7 @@ export class UserController {
       data,
     };
   }
+
   @Roles(Role.ADMIN, Role.USER)
   @UseGuards(RolesGuard)
   @Post('upload-avatar')
@@ -109,5 +110,12 @@ export class UserController {
     return {
       data,
     };
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @Delete('deleteUser/:id')
+  async deleteUserById(@Param('id') id: string) {
+    return await this.userService.getUserById(Number(id));
   }
 }

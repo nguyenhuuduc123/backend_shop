@@ -112,4 +112,10 @@ export class OrderController {
       data,
     };
   }
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
+  @Get('productDetail/:id')
+  async deleteOrderProductDetail(@Param('id') id: string) {
+    return await this.orderService.getOrderByUserId(Number(id));
+  }
 }

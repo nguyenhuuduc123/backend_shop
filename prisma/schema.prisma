@@ -88,7 +88,7 @@ model OrderOnProducts{
    orderId Int
    order Order @relation(fields: [orderId],references: [id],onDelete:Cascade)
    productId Int 
-   product Product @relation(fields: [productId],references: [id],onDelete:NoAction)
+   product Product @relation(fields: [productId],references: [id],onDelete:Cascade)
    numberOf Int?
    size String?
    color String?

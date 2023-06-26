@@ -182,4 +182,16 @@ export class UserService {
       });
     } catch (error) {}
   }
+  async deleteUserById(userId: number) {
+    try {
+      await this.prisma.user.delete({
+        where: {
+          id: userId,
+        },
+      });
+      return {
+        message: 'delete user success',
+      };
+    } catch (error) {}
+  }
 }
