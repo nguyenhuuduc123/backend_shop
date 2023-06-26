@@ -149,8 +149,20 @@ export class OrderService {
   async getAllOrder() {
     return await this.prisma.order.findMany({
       include: {
-        products: true,
-        user: true,
+        products: {
+          select: {
+            color: true,
+            size: true,
+            numberOf: true,
+            product: {
+              select: {
+                productName: true,
+                price: true,
+                productImages: true,
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -378,7 +390,7 @@ export class OrderService {
               color: true,
               size: true,
               numberOf: true,
-              // totalPrice: true,
+
               product: {
                 select: {
                   productName: true,
@@ -411,7 +423,6 @@ export class OrderService {
                   price: true,
                 },
               },
-              //  totalPrice: true,
             },
           },
         },

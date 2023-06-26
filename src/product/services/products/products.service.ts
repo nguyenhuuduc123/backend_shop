@@ -70,7 +70,17 @@ export class ProductService {
         include: {
           orders: true,
           productImages: true,
-          evaluate: true,
+          evaluate: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  avatar: true,
+                },
+              },
+            },
+          },
           categoryProduct: {
             include: {
               categoryProductDetail: true,
