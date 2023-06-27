@@ -120,7 +120,7 @@ export class OrderController {
     };
   }
   @Public()
-  @Delete('productDetail/:productId')
+  @Delete('deleteAllProductIntoCart/:productId')
   async deleteOrderProductDetail(
     @Param('productId') productId: string,
     @Query() query: QueryProductDetail,
@@ -131,7 +131,7 @@ export class OrderController {
     );
   }
   @Public()
-  @Delete('productALLDetail/:productId')
+  @Delete('deleteAllProductIntoCart/:productId')
   async deleteAllOrderProductDetail(@Param('productId') productId: string) {
     return this.orderProductService.deleteAllProductDetail(Number(productId));
   }
