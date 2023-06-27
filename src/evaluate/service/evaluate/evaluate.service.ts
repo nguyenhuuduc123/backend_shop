@@ -20,7 +20,19 @@ export class EvaluateService {
       where: {
         id: dto.productId,
       },
+      include: {
+        evaluate: true,
+      },
     });
+    const average = productFind.evaluate.reduce(function (
+      avg,
+      value,
+      _,
+      { length },
+    ) {
+      return avg + value.starts / length;
+    },
+    0);
     if (e != null) {
       const sumComment = productFind.sumComment + 1;
       const sumEvaluate = productFind.sumEvaluate + 1;
@@ -31,6 +43,7 @@ export class EvaluateService {
         data: {
           sumEvaluate: sumEvaluate,
           sumComment: sumComment,
+          averageEvaluate: average,
         },
       });
       return e;
