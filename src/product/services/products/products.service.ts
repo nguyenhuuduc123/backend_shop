@@ -123,6 +123,26 @@ export class ProductService {
             contains: productName != null ? productName : undefined,
           },
         },
+        include: {
+          orders: true,
+          productImages: true,
+          evaluate: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  avatar: true,
+                },
+              },
+            },
+          },
+          categoryProduct: {
+            include: {
+              categoryProductDetail: true,
+            },
+          },
+        },
       });
     } catch (error) {
       throw new BadRequestException('error');

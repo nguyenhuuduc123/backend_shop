@@ -387,6 +387,7 @@ export class OrderService {
         include: {
           products: {
             select: {
+              productId: true,
               color: true,
               size: true,
               numberOf: true,
@@ -395,13 +396,14 @@ export class OrderService {
                 select: {
                   productName: true,
                   price: true,
+                  productImages: true,
                 },
               },
             },
           },
         },
       });
-      return orderAll;
+      return orderAll[0];
     } catch (error) {}
   }
   async getOrderByUserId(userId: number) {
@@ -414,6 +416,7 @@ export class OrderService {
         include: {
           products: {
             select: {
+              productId: true,
               color: true,
               size: true,
               numberOf: true,
@@ -421,6 +424,7 @@ export class OrderService {
                 select: {
                   productName: true,
                   price: true,
+                  productImages: true,
                 },
               },
             },
