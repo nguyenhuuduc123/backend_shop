@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { Public } from 'src/common/decorators';
 
 import { GetCurrentUserIdByAT } from 'src/common/decorators/get-userId-at.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -66,6 +65,14 @@ export class OrderController {
       data,
     };
   }
+
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
+  @Delete('deleteAllProductIntoCart')
+  async deleteAllOrderProductDetail() {
+    return await this.orderProductService.deleteAllProductDetail();
+  }
+
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @Delete(':id')
@@ -119,20 +126,16 @@ export class OrderController {
       data,
     };
   }
-  @Public()
-  @Delete('deleteAllProductIntoCart/:productId')
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
+  @Delete('deleteProductIntoCart/:productId')
   async deleteOrderProductDetail(
     @Param('productId') productId: string,
     @Query() query: QueryProductDetail,
   ) {
-    return this.orderProductService.deleteProductDetail(
+    return await this.orderProductService.deleteProductDetail(
       Number(productId),
       query,
     );
-  }
-  @Public()
-  @Delete('deleteAllProductIntoCart/:productId')
-  async deleteAllOrderProductDetail(@Param('productId') productId: string) {
-    return this.orderProductService.deleteAllProductDetail(Number(productId));
   }
 }

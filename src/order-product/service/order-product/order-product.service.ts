@@ -15,7 +15,7 @@ export class OrderProductService {
       },
     });
   }
-  async updatePrderProduct(orderProductId: number, dto: OrderProductDto) {
+  async updateOrderProduct(orderProductId: number, dto: OrderProductDto) {
     try {
       return this.prisma.orderOnProducts.update({
         where: {

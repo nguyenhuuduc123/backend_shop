@@ -31,9 +31,10 @@ export class OrderProductDetailService {
           value.categoryProductDetail.size ==
             ConvertSize.convertSize(productDetail.size)
         ) {
-          await this.prisma.orderOnProducts.delete({
+          await this.prisma.orderOnProducts.deleteMany({
             where: {
-              id: value.categoryProductDetail.id,
+              size: ConvertSize.convertSize(productDetail.size),
+              color: ConvertColor.convertColor(productDetail.color),
             },
           });
         }
@@ -44,28 +45,12 @@ export class OrderProductDetailService {
     } catch (error) {}
   }
   // delete all product in cart
-  async deleteAllProductDetail(productId: number) {
+  async deleteAllProductDetail() {
     try {
-      const findProduct = await this.prisma.product.findUnique({
+      await this.prisma.order.deleteMany({
         where: {
-          id: productId,
+          flat: true,
         },
-        include: {
-          categoryProduct: {
-            include: {
-              categoryProductDetail: true,
-            },
-          },
-        },
-      });
-      findProduct.categoryProduct.forEach(async (value) => {
-        {
-          await this.prisma.orderOnProducts.delete({
-            where: {
-              id: value.categoryProductDetail.id,
-            },
-          });
-        }
       });
       return {
         message: 'delete success',

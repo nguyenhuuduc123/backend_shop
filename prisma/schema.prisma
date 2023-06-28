@@ -16,6 +16,7 @@ model User{
   lastName String
   phoneNumber String @unique
   address String?
+  registerDay DateTime @default(now())
   avatar String @default("")
   publicIdImage String?
   isBlocked Boolean @default(false)
