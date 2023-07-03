@@ -116,6 +116,6 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Delete('deleteUser/:id')
   async deleteUserById(@Param('id') id: string) {
-    return await this.userService.getUserById(Number(id));
+    return await this.userService.deleteUserById(Number(id));
   }
 }

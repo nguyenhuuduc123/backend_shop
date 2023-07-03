@@ -2,11 +2,8 @@ export class CreateProductDto {
   productName: string;
   description: string;
   price: number;
-  popularProduct: string[];
   quantitySold: number;
-  averageEvaluate: number;
-  SumComment: number;
-  sumEvaluate: number;
+  popularProduct: string[];
   discount: number;
   status: boolean;
 }

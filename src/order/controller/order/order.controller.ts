@@ -101,7 +101,7 @@ export class OrderController {
 
     @GetCurrentUserIdByAT('sub') userId: string,
   ) {
-    const data = await this.orderService.createCart(Number(userId), dto);
+    const data = await this.orderProductService.createCart(Number(userId), dto);
     return {
       data,
     };
@@ -111,7 +111,7 @@ export class OrderController {
   @UseGuards(RolesGuard)
   @Get('cart')
   async getCartByUserId(@GetCurrentUserIdByAT('sub') userId: string) {
-    const data = await this.orderService.getCartByUserId(Number(userId));
+    const data = await this.orderProductService.getCartByUserId(Number(userId));
     return {
       data,
     };

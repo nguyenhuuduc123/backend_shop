@@ -166,6 +166,9 @@ export class UserService {
           },
           isBlocked: false,
         },
+        orderBy: {
+          registerDay: 'asc',
+        },
         include: {
           order: true,
         },

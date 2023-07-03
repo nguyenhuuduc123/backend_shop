@@ -37,8 +37,11 @@ model Product {
   productName String
   description String
   price Int
-  quantitySold Int
-  averageEvaluate Int
+  // số lượng có 
+  quantitySold Int @default(0)
+  // tổng số lượng
+  saleNumber Int @default(0)
+  averageEvaluate Int @default(0)
   sumComment Int @default(0)
   sumEvaluate Int @default(0)
   discount Int
@@ -58,7 +61,7 @@ model Order {
   paymentMethod PAYMENTMETHOD @default(DIRECT)
   paid Boolean @default(false)
   ordered Boolean
-  userId Int
+  userId Int 
   paymentDate DateTime @default(now())
   flat Boolean @default(false)
   user User  @relation(fields: [userId], references: [id])
