@@ -6,122 +6,142 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
-model User{
-  id Int @id @default(autoincrement())
-  email String @unique
-  firstName String
-  lastName String
-  phoneNumber String @unique
-  address String?
-  registerDay DateTime @default(now())
-  avatar String @default("")
+
+model User {
+  id            Int        @id @default(autoincrement())
+  email         String     @unique
+  firstName     String
+  lastName      String
+  phoneNumber   String     @unique
+  address       String?
+  registerDay   DateTime   @default(now())
+  avatar        String     @default("")
   publicIdImage String?
-  isBlocked Boolean @default(false)
-  role Role @default(USER)
-   hash String
-  hashRt String?
-  order Order[]
-  evaluate Evaluate[]
- @@map("users")
+  isBlocked     Boolean    @default(false)
+  role          Role       @default(USER)
+  hash          String
+  hashRt        String?
+  order         Order[]
+  evaluate      Evaluate[]
+
+  @@map("users")
 }
+
 enum Role {
   USER
   ADMIN
 }
 
 model Product {
-  id Int @id @default(autoincrement())
-  productName String
-  description String
-  price Int
-  // số lượng có 
-  quantitySold Int @default(0)
-  // tổng số lượng
-  saleNumber Int @default(0)
-  averageEvaluate Int @default(0)
-  sumComment Int @default(0)
-  sumEvaluate Int @default(0)
-  discount Int
-  status Boolean  
-  productImages ProductImage[]
-  evaluate Evaluate[]
-  orders OrderOnProducts[]
-  categoryProduct ProductOnCategoryProducts[] 
-  categoryId Int?
-  category Category? @relation(fields: [categoryId],references: [id])
-  
-  
+  id              Int                         @id @default(autoincrement())
+  productName     String
+  description     String
+  price           Int
+  quantitySold    Int                         @default(0)
+  saleNumber      Int                         @default(0)
+  productThump    String?
+  averageEvaluate Int                         @default(0)
+  sumComment      Int                         @default(0)
+  sumEvaluate     Int                         @default(0)
+  discount        Int
+  status          Boolean
+  productImages   ProductImage[]
+  evaluate        Evaluate[]
+  orders          OrderOnProducts[]
+  categoryProduct ProductOnCategoryProducts[]
+  categoryId      Int?
+  category        Category?                   @relation(fields: [categoryId], references: [id])
 }
+
 model Order {
-  id Int @id @default(autoincrement())
-  orderStatus String
-  paymentMethod PAYMENTMETHOD @default(DIRECT)
-  paid Boolean @default(false)
-  ordered Boolean
-  userId Int 
-  paymentDate DateTime @default(now())
-  flat Boolean @default(false)
-  user User  @relation(fields: [userId], references: [id])
-  products OrderOnProducts[]
-  
+  id            Int               @id @default(autoincrement())
+  orderStatus   String
+  paymentMethod PAYMENTMETHOD     @default(DIRECT)
+  paid          Boolean           @default(false)
+  ordered       Boolean
+  userId        Int
+  paymentDate   DateTime          @default(now())
+  flat          Boolean           @default(false)
+  user          User              @relation(fields: [userId], references: [id])
+  products      OrderOnProducts[]
 }
+
 model CategoryProductDetail {
-  id Int @id @default(autoincrement())
-  colors COLOR @default(GREEN) 
-  size SIZE @default(XL) 
-  quantity Int @default(100)
+  id           Int                         @id @default(autoincrement())
+  colors       COLOR                       @default(GREEN)
+  size         SIZE                        @default(XL)
+  quantity     Int                         @default(100)
   remainAmount Int?
-  products ProductOnCategoryProducts[]
-  
+  products     ProductOnCategoryProducts[]
 }
+
 model Evaluate {
-  id Int @id @default(autoincrement())
-  starts Int
-  comment String
-  time DateTime @default(now())
-  userId Int  
-  user User @relation(fields: [userId], references: [id])
+  id        Int      @id @default(autoincrement())
+  starts    Int
+  comment   String
+  time      DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
   productId Int
-  product Product @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
-model OrderOnProducts{
-  id Int @id @default(autoincrement())
-   orderId Int
-   order Order @relation(fields: [orderId],references: [id],onDelete:Cascade)
-   productId Int 
-   product Product @relation(fields: [productId],references: [id],onDelete:Cascade)
-   numberOf Int?
-   size String?
-   color String?
-   totalPrice Int?
-  
- 
+
+model OrderOnProducts {
+  id         Int     @id @default(autoincrement())
+  orderId    Int
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  Int
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  numberOf   Int?
+  size       String?
+  color      String?
+  totalPrice Int?
 }
+
 model ProductOnCategoryProducts {
-  productId Int
-  product Product @relation(fields: [productId],references: [id])
-  categoryId Int
-  categoryProductDetail CategoryProductDetail  @relation(fields: [categoryId],references: [id])
-  @@id([productId,categoryId])
+  productId             Int
+  product               Product               @relation(fields: [productId], references: [id])
+  categoryId            Int
+  categoryProductDetail CategoryProductDetail @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
 }
+
 model ProductImage {
-  id Int @id @default(autoincrement())
-  url String 
+  id            Int     @id @default(autoincrement())
+  url           String
   publicIdImage String?
-  productId Int
-  product Product  @relation(fields: [productId],references: [id]) 
-  
+  productId     Int
+  product       Product @relation(fields: [productId], references: [id])
 }
+
 model Category {
-  id Int @id @default(autoincrement())
-  categoryName String 
-  productId Int?
-  isClothing Boolean @default(true)
-  products Product[]
+  id           Int       @id @default(autoincrement())
+  categoryName String    @unique
+  productId    Int?
+  isPhone      Boolean   @default(true)
+  products     Product[]
 }
+
+model SmartPhoneDetail {
+  productDetailId       Int     @id @default(autoincrement())
+  resolution            String?
+  wideScreen            String?
+  rearCameraResolution  String?
+  frontCameraResolution String?
+  operatingSystem       String?
+  processorChip         String?
+  ram                   Int?
+  rom                   Int?
+  sim                   String?
+  batteryCapacity       String?
+  batteryType           String?
+  camera                Int?
+}
+
 enum COLOR {
   BLACK
   RED
@@ -130,6 +150,7 @@ enum COLOR {
   YELLOW
   GREEN
 }
+
 enum SIZE {
   XS
   S
@@ -138,6 +159,7 @@ enum SIZE {
   XL
   XXL
 }
+
 enum PAYMENTMETHOD {
   DIRECT
   INDIRECT

@@ -6,7 +6,7 @@ import { ProductType } from 'src/order/dto/product.type';
 
 @Injectable()
 export class OrderService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
   async createOrder(userId: number, createDto: CreateOrderDto) {
     // check user exits
     try {
@@ -88,9 +88,6 @@ export class OrderService {
             },
           });
           findProduct[0].products.forEach(async (value) => {
-            //
-            console.log(createDto.color.includes(value.color));
-            console.log(createDto.color.includes(value.size));
             if (
               createDto.color.includes(value.color) &&
               createDto.size.includes(value.size)
@@ -298,6 +295,6 @@ export class OrderService {
         },
       });
       return orderAll;
-    } catch (error) {}
+    } catch (error) { }
   }
 }

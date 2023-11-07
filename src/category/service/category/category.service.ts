@@ -1,32 +1,42 @@
 import { CategoryDto } from './../../dto/category.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { createSuccessResponse } from 'src/config/config.response';
+import { INTERNAL_MESSAGE, INTERNAL_STATUS } from 'src/constant';
 
 @Injectable()
 export class CategoryService {
   constructor(private prismaService: PrismaService) {}
 
   async createCategory(dto: CategoryDto) {
-    try {
+      // check category is existing
+      const check_category = await this.prismaService.category.findUnique({
+        where : {
+          categoryName: dto.categoryName
+        }
+      })
+      if(check_category) throw new BadRequestException('category already exists')
       const createCategory = await this.prismaService.category.create({
         data: {
-          ...dto,
+          categoryName : dto.categoryName
         },
       });
-      return createCategory;
-    } catch (error) {}
+      return createSuccessResponse(INTERNAL_STATUS.CREATED,INTERNAL_MESSAGE.CREATED,createCategory);
+    }
+
+  async getAllCategory() {
+    const all_category = await this.prismaService.category.findMany({});
+    return createSuccessResponse(INTERNAL_STATUS.CREATED, INTERNAL_MESSAGE.CREATED, all_category);
   }
-  async editCategory(cateId: number, dto: CategoryDto) {
-    try {
-      await this.prismaService.category.update({
-        where: {
-          id: cateId,
-        },
-        data: {
-          categoryName: dto.categoryName != null ? dto.categoryName : undefined,
-          isClothing: dto.isClothing != null ? dto.isClothing : undefined,
-        },
-      });
-    } catch (error) {}
+
+  async deleteCategory(categoryName : string){
+    await this.prismaService.category.delete({
+      where : {
+        categoryName : categoryName
+      }
+    })
+    return createSuccessResponse(INTERNAL_STATUS.OK, INTERNAL_MESSAGE.OK);
   }
-}
+  }
+
+ 

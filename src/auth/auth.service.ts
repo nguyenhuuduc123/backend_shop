@@ -11,6 +11,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import { RegisterUserDto } from './dto/register.dto';
 import { MailerService } from '@nest-modules/mailer';
+import { createSuccessResponse } from 'src/config/config.response';
+import { INTERNAL_MESSAGE, INTERNAL_STATUS } from 'src/constant';
 @Injectable()
 export class AuthService {
   constructor(
@@ -19,7 +21,15 @@ export class AuthService {
     private mailService: MailerService,
   ) {}
 
-  async signupLocal(dto: RegisterUserDto): Promise<Tokens> {
+  async signupLocal(dto: RegisterUserDto) {
+    // check user exist
+    const user_check = await this.prisma.user.findUnique({
+      where : {
+        phoneNumber : dto.phoneNumber,
+        email : dto.email
+      }
+    })
+    if(user_check) throw new BadRequestException('user is existing')
     const hash = await this.hashData(dto.hash);
     const user = await this.prisma.user.create({
       data: {
@@ -28,15 +38,13 @@ export class AuthService {
         hash: hash,
       },
     });
-
     const tokens = await this.getTokens(user.id, user.email, user.role);
-    // const { refresh_token } = tokens;
-    //response.cookie('token', refresh_token, { httpOnly: true });
     await this.updateRtHash(user.id, tokens.refresh_token);
-    return tokens;
+    return createSuccessResponse(INTERNAL_STATUS.OK,INTERNAL_MESSAGE.OK,tokens);
   }
-  async signInLocal(dto: AuthDto): Promise<Tokens> {
-    try {
+
+  async signInLocal(dto: AuthDto)  {
+   
       const user = await this.prisma.user.findUnique({
         where: {
           email: dto.email,
@@ -47,8 +55,7 @@ export class AuthService {
       if (!passwordMatched) throw new ForbiddenException('access denied');
       const tokens = await this.getTokens(user.id, user.email, user.role);
       await this.updateRtHash(user.id, tokens.refresh_token);
-      return tokens;
-    } catch (error) {}
+    return createSuccessResponse(INTERNAL_STATUS.OK, INTERNAL_MESSAGE.OK, tokens);
   }
   async logout(userId: number) {
     await this.prisma.user.updateMany({
@@ -63,7 +70,7 @@ export class AuthService {
     // response.cookie('token', '', { httpOnly: true });
     return;
   }
-  async refreshTokens(userId: number, rt: string): Promise<Tokens> {
+  async refreshTokens(userId: number, rt: string) {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -77,7 +84,7 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.email, user.role);
     await this.updateRtHash(user.id, tokens.refresh_token);
 
-    return tokens;
+    return createSuccessResponse(INTERNAL_STATUS.OK, INTERNAL_MESSAGE.OK, tokens);
   }
 
   hashData(data: string) {

@@ -37,17 +37,9 @@ export class AuthController {
   @Post('/local/signup')
   @HttpCode(HttpStatus.CREATED)
   async signupLocal(
-    @Body() dto: RegisterUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<Tokens> {
-    const data = await this.authService.signupLocal(dto);
-    console.log(111);
-    const { refresh_token } = data;
-
-    console.log(refresh_token);
-
-    res.cookie('token', refresh_token);
-    return data;
+    @Body() dto: RegisterUserDto
+  )  {
+    return await this.authService.signupLocal(dto);
   }
 
   @Public()
@@ -57,19 +49,9 @@ export class AuthController {
     @Body() dto: AuthDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    try {
-      const data = await this.authService.signInLocal(dto);
-      console.log(111);
-      const { refresh_token } = data;
-      console.log(refresh_token);
-      res.cookie('token', '');
-      res.cookie('token', refresh_token);
-      return {
-        data: data,
-      };
-    } catch (error) {
-      throw new BadRequestException('Incorrect email or password');
-    }
+   
+    return  await this.authService.signInLocal(dto);
+   
   }
 
   @UseGuards(AtGuard)
@@ -96,19 +78,16 @@ export class AuthController {
     @GetCurrentUser() refreshToken: string,
     @Req() req: Request,
   ) {
-    console.log(userId);
-    console.log(refreshToken);
+   
     const user = req.user['data']['sub'];
     const token = req.cookies.token;
-    const data = this.authService.refreshTokens(Number(user), token);
-    return {
-      data: data,
-    };
+    return  this.authService.refreshTokens(Number(user), token);
+   
   }
 
   @Get('/profile')
   getProfileUser(@Req() req: Request) {
-    console.log(1111);
+    
     return req.user;
   }
 
@@ -116,13 +95,11 @@ export class AuthController {
   @UseGuards(AtGuard, RolesGuard)
   @Get('myName')
   getMyName(@Req() req: Request) {
-    console.log(req.user);
     return req.user;
   }
   @Public()
   @Get('/reset-password/:email')
   async sendMailtoResetPassword(@Param('email') email: string) {
-    console.log(email);
     const data = this.authService.sendEmailChangePassword(email);
     return {
       data,

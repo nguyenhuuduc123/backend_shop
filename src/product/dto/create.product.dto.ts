@@ -1,3 +1,5 @@
+import { IsNotEmpty } from "class-validator";
+
 export class CreateProductDto {
   productName: string;
   description: string;
@@ -6,4 +8,6 @@ export class CreateProductDto {
   popularProduct: string[];
   discount: number;
   status: boolean;
+  @IsNotEmpty()
+  categoryId: number
 }
